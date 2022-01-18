@@ -1,5 +1,5 @@
-import React, { Ref, SetStateAction } from 'react'
-import { StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
+import React, { SetStateAction } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import CustomButton from './CustomButton';
 import CustomTextInput from './CustomTextInput'
 
