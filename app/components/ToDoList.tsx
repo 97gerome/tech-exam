@@ -1,5 +1,5 @@
-import React from 'react'
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
+import React from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import {ToDo} from '../interfaces/interfaces';
 import ToDoItem from './ToDoItem';
