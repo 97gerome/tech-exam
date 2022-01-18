@@ -20,7 +20,7 @@ const AccountButton = (props: AccountButtonProps) => {
     )
 }
 
-export default AccountButton
+export default AccountButton;
 
 const styles = StyleSheet.create({
     button: {
