@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react'
-import { Alert, StyleSheet, Text, View } from 'react-native'
+import React, { useContext, useState } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import CustomButton from '../components/CustomButton';
 import CustomTextInput from '../components/CustomTextInput'
@@ -56,7 +56,7 @@ const VerifyEmailScreen = () => {
     )
 }
 
-export default VerifyEmailScreen
+export default VerifyEmailScreen;
 
 const styles = StyleSheet.create({
     container: {
