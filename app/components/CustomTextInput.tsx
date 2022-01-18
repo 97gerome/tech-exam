@@ -1,5 +1,5 @@
-import React, {Ref} from 'react';
-import { View, Text, StyleSheet, TextInput, KeyboardTypeOptions } from 'react-native';
+import React from 'react';
+import { StyleSheet, TextInput, KeyboardTypeOptions } from 'react-native';
 
 interface CustomTextInputProps {
     placeholder: string;
