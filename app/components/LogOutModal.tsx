@@ -1,7 +1,5 @@
-import React, { SetStateAction, useContext } from 'react';
+import React, { SetStateAction } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-import { AuthContext, UserContext } from '../context/context';
 
 interface LogOutModalProps {
     confirmLogOut: Function;
