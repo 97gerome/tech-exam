@@ -1,7 +1,7 @@
 import React, { SetStateAction, useContext } from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import { UserContext } from '../context/context';
+import { AppContext } from '../context/context';
 
 interface AccountButtonProps {
     setShowLogOut: React.Dispatch<SetStateAction<boolean>>
@@ -9,7 +9,7 @@ interface AccountButtonProps {
 
 const AccountButton = (props: AccountButtonProps) => {
 
-    const { user } = useContext(UserContext);
+    const { user } = useContext(AppContext);
 
     const { setShowLogOut } = props;
 
