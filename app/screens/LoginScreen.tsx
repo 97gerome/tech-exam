@@ -1,31 +1,27 @@
-import React, {SetStateAction, useContext, useEffect, useState} from 'react';
-import { View, Text, StyleSheet, Alert, Image } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, StyleSheet, Alert, Image } from 'react-native';
 
 import CustomButton from '../components/CustomButton';
 import CustomTextInput from '../components/CustomTextInput';
+import Loader from '../components/Loader';
 
-import { AuthContext, UserContext } from '../context/context';
+import { AppContext } from '../context/context';
 
-interface LoginScreenProps {
-    setLoading: React.Dispatch<SetStateAction<boolean>>;
-}
 
-const LoginScreen = (props: LoginScreenProps) => {
-
-    const { setLoading } = props;
-
-    const { setAuthToken } = useContext(AuthContext);
-    const { setUser } = useContext(UserContext);
+const LoginScreen = () => {
 
     const loginAPI = 'https://6gksn8nxyh.execute-api.us-east-1.amazonaws.com/prod/login';
+    
+    const { setUser, setAuthToken, setLogInData } = useContext(AppContext);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const handleLogin = async () => {
         if(email.length > 0 && password.length > 0){
-            setLoading(true);
             try {
+                setLoading(true);
                 const response = await fetch(loginAPI,
                 {
                     method: 'POST',
@@ -41,14 +37,14 @@ const LoginScreen = (props: LoginScreenProps) => {
                     const json = await response.json();
                     setUser(json.user);
                     setAuthToken(json.authToken);
+                    setLogInData(json.user, json.authToken);
                 } else {
+                    setLoading(false);
                     Alert.alert('Incorrect Email/Password');
                     throw Error('Incorrect Email/Password');
                 }
             } catch (err){
                 console.log(err);
-            } finally {
-                setLoading(false);
             }
         } else {
             Alert.alert('Invalid Email/Password', 'All fields must be filled');
@@ -61,6 +57,7 @@ const LoginScreen = (props: LoginScreenProps) => {
             <CustomTextInput placeholder={'Email'} setState={setEmail} keyboardType={'email-address'}/>
             <CustomTextInput placeholder={'Password'} setState={setPassword} secureTextEntry={true} keyboardType={'default'}/>
             <CustomButton title={'Login'} onPress={handleLogin}/>
+            {isLoading && <Loader />}
         </View>
     )
 }
@@ -72,7 +69,8 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        backgroundColor: '#FFAB76'
     },
     logo: {
         position: 'absolute',
