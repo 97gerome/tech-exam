@@ -1,47 +1,76 @@
-import { StatusBar } from 'expo-status-bar';
 import { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, ActivityIndicator, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';;
 
 import LoginScreen from './app/screens/LoginScreen';
-
-import { AuthContext, UserContext } from './app/context/context';
-
-import { User } from './app/interfaces/interfaces';
 import VerifyEmailScreen from './app/screens/VerifyEmailScreen';
 import MainScreen from './app/screens/MainScreen';
+
+import { AppContext } from './app/context/context';
+
+import { User } from './app/interfaces/interfaces';
+
+const Stack = createNativeStackNavigator();
 
 const App = () => {
 
   const [user, setUser] = useState<User | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
-  const [isLoading, setLoading] = useState<boolean>(false);
 
-  if(isLoading){
-    return (
-      <View style={styles.container}>
-          <ActivityIndicator color='#FFFFFF'/>
-      </View>
-    );
-  } else if(authToken && user){
-    return (
-      <UserContext.Provider value={{user, setUser}}>
-        <AuthContext.Provider value={{ authToken, setAuthToken }}>
-          <View style={styles.container}>
-            {user.emailVerifiedAt ? <MainScreen /> : <VerifyEmailScreen />}
-          </View>
-        </AuthContext.Provider>
-      </UserContext.Provider>
-    );
+  const getLogInData = async () => {
+    try {
+      const authToken = await AsyncStorage.getItem('authToken');
+      const user = await AsyncStorage.getItem('user');
+      if (authToken && user){
+        const json = await JSON.parse(user);
+        if(json.emailVerifiedAt){
+          setUser(json);
+          setAuthToken(authToken);
+        }
+      }
+    } catch (err){
+      console.log(err);
+    } finally {
+    }
   }
 
+  const setLogInData = async (user: User, authToken: string) => {
+    try {
+      await AsyncStorage.multiSet([['user', JSON.stringify(user)], ['authToken', authToken]]);
+    } catch (err){
+      console.log(err);
+    }
+  }
+
+  const removeLogInData = async () => {
+    try {
+      await AsyncStorage.multiRemove(['user', 'authToken']);
+    } catch (err){
+      console.log(err);
+    }
+  }
+
+  useEffect(() => {
+   getLogInData();
+  }, []);
+
   return (
-    <UserContext.Provider value={{user, setUser}}>
-      <AuthContext.Provider value={{ authToken, setAuthToken }}>
-        <View style={styles.container}>
-          <LoginScreen setLoading={setLoading}/>
-        </View>
-      </AuthContext.Provider>
-    </UserContext.Provider>
+    <AppContext.Provider value={{ user, setUser, authToken, setAuthToken, getLogInData, setLogInData, removeLogInData }}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {authToken ?
+            user?.emailVerifiedAt ?
+              <Stack.Screen name='Main' component={MainScreen} />
+              :
+              <Stack.Screen name='VerifyEmail' component={VerifyEmailScreen} />
+            :
+            <Stack.Screen name='LogIn' component={LoginScreen} />
+          }
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AppContext.Provider>
   );
 }
 
