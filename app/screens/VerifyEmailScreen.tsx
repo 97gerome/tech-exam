@@ -4,20 +4,22 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import CustomTextInput from '../components/CustomTextInput'
 
-import { AuthContext, UserContext } from '../context/context';
+import { AppContext } from '../context/context';
+import Loader from '../components/Loader';
 
 const VerifyEmailScreen = () => {
 
     const verificationAPI = 'https://6gksn8nxyh.execute-api.us-east-1.amazonaws.com/prod/confirm-email';
 
-    const { setUser } = useContext(UserContext);
-    const { authToken, setAuthToken } = useContext(AuthContext);
+    const { setUser, authToken, setAuthToken  } = useContext(AppContext);
 
     const [verficationCode, setVerificationCode] = useState<string>('');
+    const [isLoading, setLoading] = useState<boolean>(false);
 
     const handleVerification = async () => {
         if (verficationCode.length >= 5) {
             try {
+                setLoading(true);
                 const response = await fetch(verificationAPI, {
                     method: 'POST',
                     headers: {
@@ -30,9 +32,11 @@ const VerifyEmailScreen = () => {
                 });
                 if (response.ok) {
                     const json = await response.json();
+                    setLoading(false);
                     setUser(json.user);
                     setAuthToken(json.authToken);
                 } else {
+                    setLoading(false);
                     Alert.alert('Invalid verification code');
                     throw Error(`Error ${response.status}`);
                 }
@@ -52,6 +56,7 @@ const VerifyEmailScreen = () => {
                 <CustomTextInput placeholder='12345' setState={setVerificationCode} keyboardType='numeric' />
                 <CustomButton title='Verify' onPress={handleVerification} />
             </View>
+            {isLoading && <Loader />}
         </View>
     )
 }
@@ -63,7 +68,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         paddingTop: 100,
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: '#FFAB76'
     },
     form: {
         width: '70%',

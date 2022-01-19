@@ -1,21 +1,21 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import CreateToDo from '../components/CreateToDo';
 import LogOutModal from '../components/LogOutModal';
 import ToDoList from '../components/ToDoList';
 
-import { AuthContext, UserContext } from '../context/context';
+import { AppContext } from '../context/context';
 
 import { ToDo } from '../interfaces/interfaces';
 import NavBar from '../components/NavBar';
+import Loader from '../components/Loader';
 
 const MainScreen = () => {
 
     const toDosAPI = 'https://6gksn8nxyh.execute-api.us-east-1.amazonaws.com/prod/todo';
 
-    const { authToken, setAuthToken } = useContext(AuthContext);
-    const { user, setUser } = useContext(UserContext);
+    const { authToken, setAuthToken, user, setUser, removeLogInData } = useContext(AppContext);
 
     const [toDos, setToDos] = useState<Array<ToDo>>([]);
     const [isLoading, setLoading] = useState<boolean>(false);
@@ -23,8 +23,8 @@ const MainScreen = () => {
     const [showLogOut, setShowLogOut] = useState(false);
 
     const getToDos = async () => {
-        setLoading(true);
         try{
+            setLoading(true);
             const response = await fetch(toDosAPI, {
                 method: 'GET',
                 headers: {
@@ -90,7 +90,6 @@ const MainScreen = () => {
     }
 
     const deleteToDo = async (id: string) => {
-
         try {
             const response = await fetch(toDosAPI + `/${id}`, {
                 method: 'DELETE',
@@ -121,11 +120,6 @@ const MainScreen = () => {
         ]);
     }
 
-    const clearSession = () => {
-        setUser(null);
-        setAuthToken(null);
-    }
-
     const confirmLogOut = () => {
         Alert.alert('Log Out', 'Are you sure you want to Log Out?', [
             {
@@ -133,7 +127,11 @@ const MainScreen = () => {
                 style:'cancel'
             }, {
                 text: 'Log Out', 
-                onPress: () => clearSession()
+                onPress: () => {
+                    removeLogInData();
+                    setAuthToken(null);
+                    setUser(null);
+                }
             }
         ]);
     }
@@ -141,23 +139,6 @@ const MainScreen = () => {
     useEffect(() => {
         getToDos();
     }, []);
-
-    if(isLoading){
-        return (
-        <View style={styles.container}>
-            <NavBar setShowLogOut={setShowLogOut} />
-            <Text
-                style={styles.title}
-                numberOfLines={1}
-                ellipsizeMode='tail'
-            >
-                {`${user.name}'s To Do List`}
-            </Text>
-            <View style={styles.loadingContainer}>
-                    <ActivityIndicator color='#FFFFFF' />
-            </View>
-        </View>
-    )}
 
     return (
         <View style={styles.container}>
@@ -169,8 +150,20 @@ const MainScreen = () => {
             >
                 {`${user.name}'s To Do List`}
             </Text>
-            <CreateToDo newToDoName={newToDoName} setNewToDoName={setNewToDoName} putToDo={putToDo} />
-            <ToDoList toDos={toDos} completeToDo={completeToDo} confirmDeleteToDo={confirmDeleteToDo}/>
+            {isLoading ?
+                <Loader />
+                :
+                <>
+                    <CreateToDo
+                        newToDoName={newToDoName}
+                        setNewToDoName={setNewToDoName}
+                        putToDo={putToDo} />
+                    <ToDoList
+                        toDos={toDos}
+                        completeToDo={completeToDo}
+                        confirmDeleteToDo={confirmDeleteToDo} />
+                </>
+            }
             {showLogOut &&
                 <LogOutModal confirmLogOut={confirmLogOut} setShowLogOut={setShowLogOut} />
             }
@@ -183,7 +176,9 @@ export default MainScreen;
 const styles = StyleSheet.create({
     container: {
         height: '100%',
-        width: '100%'
+        width: '100%',
+        paddingTop: 40,
+        backgroundColor: '#FFAB76'
     },
     title: {
         fontSize: 34,
