@@ -34,6 +34,8 @@ const MainScreen = () => {
             if (response.ok){
                 const json = await response.json();
                 setToDos(json);
+            } else {
+                throw Error(`Error ${response.status}`);
             }
         } catch (err) {
             console.log(err);
@@ -57,6 +59,8 @@ const MainScreen = () => {
                 if (response.ok){
                     getToDos();
                     setNewToDoName('');
+                } else {
+                    throw Error(`Error ${response.status}`);
                 }
             } catch (err) {
                 console.log(err);
@@ -77,6 +81,8 @@ const MainScreen = () => {
             if (response.ok) {
                 getToDos();
                 setNewToDoName('');
+            } else {
+                throw Error(`Error ${response.status}`);
             }
         } catch (err) {
             console.log(err);
@@ -95,6 +101,8 @@ const MainScreen = () => {
             if (response.ok) {
                 getToDos();
                 setNewToDoName('');
+            } else {
+                throw Error(`Error ${response.status}`);
             }
         } catch (err) {
             console.log(err);
