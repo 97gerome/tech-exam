@@ -34,7 +34,7 @@ const VerifyEmailScreen = () => {
                     setAuthToken(json.authToken);
                 } else {
                     Alert.alert('Invalid verification code');
-                    throw Error('Incorrect verification code');
+                    throw Error(`Error ${response.status}`);
                 }
             } catch (err) {
                 console.log(err);
