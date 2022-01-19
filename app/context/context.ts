@@ -1,5 +1,3 @@
-import React, { SetStateAction } from "react";
+import React from "react";
 
-export const AuthContext = React.createContext<any>(undefined);
-
-export const UserContext = React.createContext<any>(undefined);
+export const AppContext = React.createContext<any>(undefined);
